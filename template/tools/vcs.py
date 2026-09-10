@@ -64,7 +64,7 @@ class VCSAdapter:
     def status(self) -> VCSResult:
         """Query working directory status (modified, untracked, deleted files)."""
         if self.vcs_type == "piper":
-            return self._run(["hg", "status"])
+            return self._run(["hg", "status", "."])
         elif self.vcs_type == "git":
             return self._run(["git", "status", "--porcelain"])
         else:
@@ -84,7 +84,8 @@ class VCSAdapter:
             return VCSResult(success=False, stdout="", stderr="Commit message cannot be empty", returncode=1)
 
         if self.vcs_type == "piper":
-            return self._run(["hg", "commit", "-m", clean_msg])
+            self._run(["hg", "addremove", "."])
+            return self._run(["hg", "commit", "-m", clean_msg, "."])
         elif self.vcs_type == "git":
             add_res = self._run(["git", "add", "-A"])
             if not add_res.success:
