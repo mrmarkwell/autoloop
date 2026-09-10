@@ -57,13 +57,15 @@ class ProjectVerifier:
         self.lint_cmd = verif_cfg.get("lint_command")
         self.timeout_sec = float(verif_cfg.get("timeout_sec", 120.0))
 
-        if not self.test_cmd and self.build_system != "unbootstrapped":
+        if not self.test_cmd:
             from tools.detector import detect_environment
             profile = detect_environment(self.root_dir)
-            self.test_cmd = profile.test_command
-            self.build_cmd = self.build_cmd or profile.build_command
-            self.lint_cmd = self.lint_cmd or profile.lint_command
-            self.build_system = self.build_system or profile.build_system
+            # If tests directory now exists with test files, auto-upgrade from unbootstrapped
+            if profile.test_command:
+                self.test_cmd = profile.test_command
+                self.build_cmd = self.build_cmd or profile.build_command
+                self.lint_cmd = self.lint_cmd or profile.lint_command
+                self.build_system = profile.build_system
 
     def _execute(self, name: str, cmd_str: Optional[str]) -> CommandResult:
         if not cmd_str or not cmd_str.strip():
