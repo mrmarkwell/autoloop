@@ -155,10 +155,15 @@ def bootstrap_project(target_dir: Path, spec: ProjectSpec) -> None:
     config_file = config_dir / "autoloop.json"
     config_file.write_text(json.dumps(spec.to_config_dict(), indent=2), encoding="utf-8")
 
-    # 5. Try installing git hooks if git repository
+    # 5. Try installing git hooks and creating initial commit if git repository
     if spec.vcs_type == "git":
         import subprocess
         subprocess.run(["python3", "tools/doctor.py", "--install-hooks"], cwd=str(target_dir), check=False)
+        # Check if repo has no commits yet
+        res = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(target_dir), capture_output=True, check=False)
+        if res.returncode != 0:
+            subprocess.run(["git", "add", "-A"], cwd=str(target_dir), check=False)
+            subprocess.run(["git", "commit", "-m", f"feat: initial scaffolding for {spec.name} from autoloop"], cwd=str(target_dir), check=False)
 
     print("\n[✓] Project scaffolding successfully deployed!")
     print("----------------------------------------------------------------------")
