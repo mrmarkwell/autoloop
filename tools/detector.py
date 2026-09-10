@@ -117,7 +117,7 @@ def detect_build_system(path: Path, vcs_type: str, vcs_details: Dict[str, Any]) 
     if vcs_type == "piper":
         pkg = vcs_details.get("package_path", "")
         has_build = any(path.glob("**/BUILD")) or any(path.glob("**/BUILD.bazel")) or (path / "BUILD").exists()
-        if has_build or pkg:
+        if has_build:
             target = f"//{pkg}/..." if pkg else "//..."
             return "blaze", f"blaze build {target}", f"blaze test {target}", "hg fix"
         return "unbootstrapped", None, None, "hg fix"

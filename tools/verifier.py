@@ -81,6 +81,18 @@ class ProjectVerifier:
             )
 
         # Check if running python unittest on a non-existent tests directory
+        if "blaze" in cmd_str and not any(self.root_dir.glob("**/BUILD")) and not (self.root_dir / "BUILD").exists():
+            return CommandResult(
+                name=name,
+                command=cmd_str,
+                passed=True,
+                duration_sec=0.0,
+                stdout="",
+                stderr="",
+                skipped=True,
+                message="Pending bootstrap (BUILD file will be created in Phase 0)",
+            )
+
         if "unittest discover" in cmd_str and not (self.root_dir / "tests").exists():
             return CommandResult(
                 name=name,
