@@ -1,0 +1,12 @@
+# BLOCKED — Human Intervention Required
+
+> **Notice**: When this file exists (renamed to `BLOCKED.md`), the autonomous Ralph loop immediately halts to prevent spinning or hallucinating placeholder data.
+
+## Blocker Summary
+- **Attempted Task**: Description of the task being executed.
+- **Blocker Encountered**: Exact missing secret, API credential, or hardware barrier.
+
+## Required Human Action
+1. Supply required credential or resolve environmental barrier.
+2. Delete `BLOCKED.md`.
+3. Re-run `./ralph.sh` (or `./ralph.sh --loop`).
