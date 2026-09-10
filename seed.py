@@ -113,6 +113,7 @@ def bootstrap_project(target_dir: Path, spec: ProjectSpec) -> None:
 
     # 1. Copy template files
     files_to_copy = [
+        ".gitignore",
         "ralph.sh",
         "AGENTS.md",
         "GEMINI.md",
