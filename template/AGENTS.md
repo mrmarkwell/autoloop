@@ -29,6 +29,10 @@ When the human author initiates a conversation asking questions, brainstorming, 
 # Run a fixed number of continuous iterations (e.g. 5):
 ./ralph.sh --loop 5
 
+# Display whole project status & overview (supercharged git status without running an iteration):
+./ralph.sh status
+./ralph.sh overview
+
 # Explicit Executive Summary Briefing (on-demand):
 ./ralph.sh --summary
 ./ralph.sh -s -p

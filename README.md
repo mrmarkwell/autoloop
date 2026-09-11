@@ -118,10 +118,14 @@ cd /path/to/my_new_project
 # 4. Interactive pairing mode (opens TUI with auto-cadence detection):
 ./ralph.sh
 
-# 5. On-demand Senior PM Meta-Improvement Sprint:
+# 5. Display whole project status & overview (supercharged git status without running an iteration):
+./ralph.sh status
+./ralph.sh overview
+
+# 6. On-demand Senior PM Meta-Improvement Sprint:
 ./ralph.sh --cleanup -p
 
-# 6. On-demand Executive Summary & Trajectory Briefing:
+# 7. On-demand Executive Summary & Trajectory Briefing:
 ./ralph.sh --summary -p
 ```
 

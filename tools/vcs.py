@@ -130,6 +130,77 @@ class VCSAdapter:
             return res.stdout
         return ""
 
+    def get_branch(self) -> str:
+        """Return the current branch or workspace identifier."""
+        if self.vcs_type == "git":
+            res = self._run(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+            return res.stdout if res.success and res.stdout else "main"
+        elif self.vcs_type == "piper":
+            return self.vcs_details.get("citc_client", "CitC")
+        return "local"
+
+    def get_tracking_status(self) -> str:
+        """Return upstream tracking information."""
+        if self.vcs_type == "git":
+            res = self._run(["git", "status", "-sb"])
+            if res.success and res.stdout:
+                line = res.stdout.splitlines()[0]
+                if "..." in line:
+                    tail = line.split("...")[1]
+                    if "[" in tail:
+                        return tail[tail.index("[") :]
+                    return f"up to date with {tail}"
+            return "local only"
+        elif self.vcs_type == "piper":
+            return "synced with cloud depot"
+        return "standalone"
+
+    def get_latest_commit(self) -> str:
+        """Return short description of the most recent commit or revision."""
+        if self.vcs_type == "git":
+            res = self._run(["git", "log", "-1", "--format=%h — %s (%cr)"])
+            return res.stdout if res.success and res.stdout else ""
+        elif self.vcs_type == "piper":
+            res = self._run(["hg", "log", "-r", ".", "--template", "{node|short} — {desc|firstline}"])
+            return res.stdout if res.success and res.stdout else ""
+        return ""
+
+    def get_detailed_status(self) -> Dict[str, Any]:
+        """Return comprehensive working tree breakdown for executive status."""
+        st = self.status()
+        clean = True
+        staged_cnt = 0
+        mod_cnt = 0
+        untracked_cnt = 0
+        changed: List[str] = []
+
+        if st.stdout.strip():
+            lines = [l for l in st.stdout.splitlines() if l.strip()]
+            if lines and lines[0] != "Local mode: all changes untracked":
+                clean = False
+                for l in lines:
+                    prefix = l[:2]
+                    changed.append(l)
+                    if prefix == "??":
+                        untracked_cnt += 1
+                    else:
+                        if prefix[0] in "MADRC":
+                            staged_cnt += 1
+                        if len(prefix) > 1 and prefix[1] in "MD":
+                            mod_cnt += 1
+
+        return {
+            "vcs_type": self.vcs_type,
+            "branch": self.get_branch(),
+            "tracking": self.get_tracking_status(),
+            "clean": clean,
+            "staged_count": staged_cnt,
+            "modified_count": mod_cnt,
+            "untracked_count": untracked_cnt,
+            "changed_files": changed,
+            "latest_commit": self.get_latest_commit(),
+        }
+
 
 if __name__ == "__main__":
     target = Path.cwd()
